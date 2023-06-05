@@ -15,13 +15,21 @@ jobs:
     steps:  
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: ./build.sh
+      run: ./build.sh liop/hikyuu
       
     - name: 'Get Previous tag'
       id: previoustag
       uses: "WyriHaximus/github-action-get-previous-tag@v1"
       with:
         fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
-    
+        
+    - name: add docker tag
+      run: docker tag liop/hikyuu liop/hikyuu:${{ steps.previoustag.outputs.tag }}
+      
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: publish
-      run: docker push liop/hikyuu:${{ steps.previoustag.outputs.tag }}
+      run: docker push liop/hikyuu
